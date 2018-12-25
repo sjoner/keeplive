@@ -2,6 +2,9 @@
 ## 集成了无声音乐（已考虑功耗，降至最低），前台服务、双进程守护、像素保活，jobs五种保活方式
 ## 主流的魅族、小米、锤子、vivo、努比亚、三星、华为等品牌，涵盖4.4至9.0的机型测试结果为，只要用户不主动杀死程序就不会死，但某些机型锁屏即断网的问题不是我能解决的。
 ## 更新日志
+### 【1.1.0 稳定版】 2018-12-25 【注意看集成文档，本次更新了一些配置】
+#### 1.新增安卓7.0及以下自动隐藏通知特性
+#### 2.消除安卓9.0会有通知声音的问题
 ### 【1.0.8】 2018-12-11
 #### 1.修改ENERGY省电模式保活逻辑，保活效果更好一些，不过肯定不如ROGUE（流氓模式）
 #### 2.修改KeepLiveService的实现方法，不再传递Context
@@ -60,6 +63,7 @@
         <receiver android:name="com.fanjun.keeplive.receiver.NotificationClickReceiver"/>
         <activity android:name="com.fanjun.keeplive.activity.OnePixelActivity"/>
         <service android:name="com.fanjun.keeplive.service.LocalService"/>
+        <service android:name="com.fanjun.keeplive.service.HideForegroundService"/>
         <service android:name="com.fanjun.keeplive.service.JobHandlerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name="com.fanjun.keeplive.service.RemoteService" android:process=":remote"/>
 ```
@@ -69,11 +73,11 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.0.8</version>
+  <version>1.1.0</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.0.8'
+implementation 'com.fanjun:keeplive:1.1.0'
 ```
