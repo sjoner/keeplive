@@ -2,6 +2,8 @@
 ## 集成了无声音乐（已考虑功耗，降至最低），前台服务、双进程守护、像素保活，jobs五种保活方式
 ## 主流的魅族、小米、锤子、vivo、努比亚、三星、华为等品牌，涵盖4.4至9.0的机型测试结果为，只要用户不主动杀死程序就不会死，但某些机型锁屏即断网的问题不是我能解决的。
 ## 更新日志
+### 【1.1.2 】 2019-01-02 
+#### 1.修复了应用切换到后台息屏再亮屏，应用会自动显示到前台的bug；
 ### 【1.1.1 】 2018-12-28 
 #### 1.应@bob要求，不再要求对KeepLive.startWork()方法中ForegroundNotification强制传参，如果不想要前台服务则传null就可以了。经过极端压力测试，在不使用前台服务的情况下，扛不住，所以不建议不使用前台服务；
 ### 【1.1.0 稳定版】 2018-12-25 【注意看集成文档，本次更新了一些配置】
@@ -75,11 +77,11 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.1'
+implementation 'com.fanjun:keeplive:1.1.2'
 ```
