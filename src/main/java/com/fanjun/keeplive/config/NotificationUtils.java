@@ -13,7 +13,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 
 public class NotificationUtils extends ContextWrapper {
-    private static NotificationUtils notificationUtils;
     private NotificationManager manager;
     private String id;
     private String name;
@@ -31,7 +30,11 @@ public class NotificationUtils extends ContextWrapper {
     public void createNotificationChannel() {
         if (channel == null) {
             channel = new NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH);
-            channel.enableVibration(false);//不震动
+            channel.enableVibration(false);
+            channel.enableLights(false);
+            channel.enableVibration(false);
+            channel.setVibrationPattern(new long[]{0});
+            channel.setSound(null, null);
             getManager().createNotificationChannel(channel);
         }
     }
@@ -68,9 +71,7 @@ public class NotificationUtils extends ContextWrapper {
     }
 
     public static void sendNotification(@NonNull Context context, @NonNull String title, @NonNull String content, @NonNull int icon, @NonNull Intent intent) {
-        if (notificationUtils == null) {
-            notificationUtils = new NotificationUtils(context);
-        }
+        NotificationUtils notificationUtils = new NotificationUtils(context);
         Notification notification = null;
         if (Build.VERSION.SDK_INT >= 26) {
             notificationUtils.createNotificationChannel();
@@ -82,9 +83,7 @@ public class NotificationUtils extends ContextWrapper {
     }
 
     public static Notification createNotification(@NonNull Context context, @NonNull String title, @NonNull String content, @NonNull int icon, @NonNull Intent intent) {
-        if (notificationUtils == null) {
-            notificationUtils = new NotificationUtils(context);
-        }
+        NotificationUtils notificationUtils = new NotificationUtils(context);
         Notification notification = null;
         if (Build.VERSION.SDK_INT >= 26) {
             notificationUtils.createNotificationChannel();

@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -56,10 +57,12 @@ public final class RemoteService extends Service {
 
         @Override
         public void wakeUp(String title, String discription, int iconRes) throws RemoteException {
-            Intent intent2 = new Intent(getApplicationContext(), NotificationClickReceiver.class);
-            intent2.setAction(NotificationClickReceiver.CLICK_NOTIFICATION);
-            Notification notification = NotificationUtils.createNotification(RemoteService.this, title, discription, iconRes, intent2);
-            RemoteService.this.startForeground(13691, notification);
+            if(Build.VERSION.SDK_INT < 25){
+                Intent intent2 = new Intent(getApplicationContext(), NotificationClickReceiver.class);
+                intent2.setAction(NotificationClickReceiver.CLICK_NOTIFICATION);
+                Notification notification = NotificationUtils.createNotification(RemoteService.this, title, discription, iconRes, intent2);
+                RemoteService.this.startForeground(13691, notification);
+            }
         }
 
     }

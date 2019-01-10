@@ -9,11 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.MediaPlayer;
+import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.R;
@@ -21,13 +21,13 @@ import com.fanjun.keeplive.config.NotificationUtils;
 import com.fanjun.keeplive.receiver.NotificationClickReceiver;
 import com.fanjun.keeplive.receiver.OnepxReceiver;
 
-@SuppressWarnings(value = {"unchecked", "deprecation"})
 public final class LocalService extends Service {
     private OnepxReceiver mOnepxReceiver;
     private ScreenStateReceiver screenStateReceiver;
     private boolean isPause = true;//控制暂停
     private MediaPlayer mediaPlayer;
     private MyBilder mBilder;
+    private android.os.Handler handler;
 
     @Override
     public void onCreate() {
@@ -37,9 +37,11 @@ public final class LocalService extends Service {
         }
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         isPause = pm.isScreenOn();
+        if (handler == null) {
+            handler = new Handler();
+        }
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return mBilder;
@@ -55,7 +57,18 @@ public final class LocalService extends Service {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     if (!isPause) {
-                        play();
+                        if (KeepLive.runMode == KeepLive.RunMode.ROGUE) {
+                            play();
+                        } else {
+                            if (handler != null) {
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        play();
+                                    }
+                                }, 10000);
+                            }
+                        }
                     }
                 }
             });
@@ -90,8 +103,15 @@ public final class LocalService extends Service {
             this.bindService(intent3, connection, Context.BIND_ABOVE_CLIENT);
         } catch (Exception e) {
         }
+        //隐藏服务通知
+        try {
+            if(Build.VERSION.SDK_INT < 25){
+                startService(new Intent(this, HideForegroundService.class));
+            }
+        } catch (Exception e) {
+        }
         if (KeepLive.keepLiveService != null) {
-            KeepLive.keepLiveService.onWorking(this);
+            KeepLive.keepLiveService.onWorking();
         }
         return START_STICKY;
     }
@@ -151,7 +171,7 @@ public final class LocalService extends Service {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             try {
-                if (mBilder != null && KeepLive.foregroundNotification != null){
+                if (mBilder != null && KeepLive.foregroundNotification != null) {
                     GuardAidl guardAidl = GuardAidl.Stub.asInterface(service);
                     guardAidl.wakeUp(KeepLive.foregroundNotification.getTitle(), KeepLive.foregroundNotification.getDescription(), KeepLive.foregroundNotification.getIconRes());
                 }
@@ -168,7 +188,7 @@ public final class LocalService extends Service {
         unregisterReceiver(mOnepxReceiver);
         unregisterReceiver(screenStateReceiver);
         if (KeepLive.keepLiveService != null) {
-            KeepLive.keepLiveService.onStop(this);
+            KeepLive.keepLiveService.onStop();
         }
     }
 }

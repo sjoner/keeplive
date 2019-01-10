@@ -1,6 +1,7 @@
 package com.fanjun.keeplive.service;
 
 import android.app.ActivityManager;
+import android.app.Notification;
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
@@ -11,6 +12,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import com.fanjun.keeplive.KeepLive;
+import com.fanjun.keeplive.config.NotificationUtils;
+import com.fanjun.keeplive.receiver.NotificationClickReceiver;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,10 +31,7 @@ public final class JobHandlerService extends JobService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //启动本地服务
-        startService(new Intent(this, LocalService.class));
-        //启动守护进程
-        startService(new Intent(this, RemoteService.class));
+        startService(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo.Builder builder = new JobInfo.Builder(startId++,
@@ -53,20 +56,34 @@ public final class JobHandlerService extends JobService {
         return START_STICKY;
     }
 
+    private void startService(Context context){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (KeepLive.foregroundNotification != null) {
+                Intent intent2 = new Intent(getApplicationContext(), NotificationClickReceiver.class);
+                intent2.setAction(NotificationClickReceiver.CLICK_NOTIFICATION);
+                Notification notification = NotificationUtils.createNotification(this, KeepLive.foregroundNotification.getTitle(), KeepLive.foregroundNotification.getDescription(), KeepLive.foregroundNotification.getIconRes(), intent2);
+                startForeground(13691, notification);
+            }
+        }
+        //启动本地服务
+        Intent localIntent = new Intent(context, LocalService.class);
+        //启动守护进程
+        Intent guardIntent = new Intent(context, RemoteService.class);
+        startService(localIntent);
+        startService(guardIntent);
+    }
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
-        if (!isServiceRunning(getApplicationContext(), "com.fanjun.keeplive.service.AcquireService") || !isServiceRunning(getApplicationContext(), getPackageName()+":remote")) {
-            startService(new Intent(this, LocalService.class));
-            startService(new Intent(this, RemoteService.class));
+        if (!isServiceRunning(getApplicationContext(), "com.fanjun.keeplive.service.LocalService") || !isRunningTaskExist(getApplicationContext(), getPackageName()+":remote")) {
+            startService(this);
         }
         return false;
     }
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        if (!isServiceRunning(getApplicationContext(), "com.fanjun.keeplive.service.AcquireService") || !isServiceRunning(getApplicationContext(), getPackageName()+":remote")) {
-            startService(new Intent(this, LocalService.class));
-            startService(new Intent(this, RemoteService.class));
+        if (!isServiceRunning(getApplicationContext(), "com.fanjun.keeplive.service.LocalService") || !isRunningTaskExist(getApplicationContext(), getPackageName()+":remote")) {
+            startService(this);
         }
         return false;
     }
@@ -84,5 +101,15 @@ public final class JobHandlerService extends JobService {
             }
         }
         return isRunning;
+    }
+    private boolean isRunningTaskExist(Context context, String processName){
+        ActivityManager am=(ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> processList = am.getRunningAppProcesses();
+        for(ActivityManager.RunningAppProcessInfo info:processList){
+            if (info.processName.equals(processName)){
+                return true;
+            }
+        }
+        return false;
     }
 }
