@@ -2,6 +2,8 @@
 ## 集成了无声音乐（已考虑功耗，降至最低），前台服务、双进程守护、像素保活，jobs五种保活方式
 ## 主流的魅族、小米、锤子、vivo、努比亚、三星、华为等品牌，涵盖4.4至9.0的机型测试结果为，只要用户不主动杀死程序就不会死，但某些机型锁屏即断网的问题不是我能解决的。
 ## 更新日志
+### 【1.1.4 】 2019-01-24 
+#### 1.修复了unbindService(connection)可能造成部分机器java.lang.IllegalArgumentException: Service not registered的bug；
 ### 【1.1.3 】 2019-01-07 
 #### 1.修复了jobservice中获取remote进程存活状态永远为false的bug；
 ### 【1.1.2 】 2019-01-02 
@@ -79,13 +81,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.3</version>
+  <version>1.1.4</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.3'
+implementation 'com.fanjun:keeplive:1.1.4'
 ```
 
 #### 联系我
