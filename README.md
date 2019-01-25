@@ -2,6 +2,8 @@
 ## 集成了无声音乐（已考虑功耗，降至最低），前台服务、双进程守护、像素保活，jobs五种保活方式
 ## 主流的魅族、小米、锤子、vivo、努比亚、三星、华为等品牌，涵盖4.4至9.0的机型测试结果为，只要用户不主动杀死程序就不会死，但某些机型锁屏即断网的问题不是我能解决的。
 ## 更新日志
+### 【1.1.5 】 2019-01-25 
+#### 1.简化了集成流程，无需再配置manifest文件；
 ### 【1.1.4 】 2019-01-24 
 #### 1.修复了unbindService(connection)可能造成部分机器java.lang.IllegalArgumentException: Service not registered的bug；
 ### 【1.1.3 】 2019-01-07 
@@ -26,7 +28,7 @@
 ### 【1.0.3】 2018-10-25 
 #### 1.修复了在安卓9.0版本上引发闪退的bug
 #### 2.ForegroundNotificationClickListener新增Context参数，用于通知栏传递值
-### 第一步，在application中启动保活服务
+### 使用方式，在application中启动保活服务
 ```Java
         //定义前台服务的默认样式。即标题、描述和图标
         ForegroundNotification foregroundNotification = new ForegroundNotification("测试","描述", R.mipmap.ic_launcher,
@@ -60,34 +62,19 @@
                 }
         );
 ```
-### 第二步，在manifest中添加权限申请，可能会报过时，不必在意
-```Xml
-        <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> //TODD兼容Android9.0权限
-        <uses-permission android:name="android.permission.GET_TASKS"/>
-        <uses-permission android:name="android.permission.REORDER_TASKS"/>
-```
-### 第三步，在manifest中添加相关service及broadcast。原样copy，不要改动
-```Xml
-        <receiver android:name="com.fanjun.keeplive.receiver.NotificationClickReceiver"/>
-        <activity android:name="com.fanjun.keeplive.activity.OnePixelActivity"/>
-        <service android:name="com.fanjun.keeplive.service.LocalService"/>
-        <service android:name="com.fanjun.keeplive.service.HideForegroundService"/>
-        <service android:name="com.fanjun.keeplive.service.JobHandlerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
-        <service android:name="com.fanjun.keeplive.service.RemoteService" android:process=":remote"/>
-```
 ### 依赖
 #### Maven
 ```Xml
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.4'
+implementation 'com.fanjun:keeplive:1.1.5'
 ```
 
 #### 联系我
