@@ -6,6 +6,8 @@
 ## 新框架发布 https://github.com/fanqieVip/processroute
 ### 基于AIDL的组件化框架，具有轻量化，倾入性极低的优点，欢迎踊跃提出改良建议！
 ## 更新日志
+### 【1.1.9】 2019-04-11
+#### 1.修复了部分手机退出程序后，程序保活自启后导致最近任务中又会看到这个程序的bug；
 ### 【1.1.8】 2019-03-21
 #### 1.修复了APP在后台时，解锁屏幕后APP闪现的bug；
 #### 2.修复了部分限制后台打开Activity造成像素保活失败的机型（大部分做了限制的机型还是不行）；
@@ -78,13 +80,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.8</version>
+  <version>1.1.9</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.8'
+implementation 'com.fanjun:keeplive:1.1.9'
 ```
 
 #### 联系我
