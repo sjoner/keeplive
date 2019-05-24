@@ -85,13 +85,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.10</version>
+  <version>1.1.11</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.10'
+implementation 'com.fanjun:keeplive:1.1.11'
 ```
 
 #### 联系我
