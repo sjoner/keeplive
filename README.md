@@ -6,6 +6,9 @@
 ## 新框架发布 https://github.com/fanqieVip/processroute
 ### 基于AIDL的组件化框架，具有轻量化，倾入性极低的优点，欢迎踊跃提出改良建议！
 ## 更新日志
+### 【1.1.11】 2019-05-24
+#### 1.修复了双进程守护可能诱发的“android.os.DeadSystemException”异常；
+#### 2.新增KeepLive.useSilenceMusice(boolean) API，可设置是否启用无声音乐（默认开启）；
 ### 【1.1.10】 2019-04-17
 #### 1.修复了部分手机JobHandlerService.isRunningTaskExist、KeepLive.isMain引发空指针的bug；
 ### 【1.1.9】 2019-04-11
