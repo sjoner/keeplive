@@ -6,6 +6,8 @@
 ## 新框架发布 https://github.com/fanqieVip/processroute
 ### 基于AIDL的组件化框架，具有轻量化，倾入性极低的优点，欢迎踊跃提出改良建议！
 ## 更新日志
+### 【1.1.12】 2019-06-21
+#### 1.修复了可能发生的“android.os.IPowerManager.isInteractive()' on a null object reference”异常；
 ### 【1.1.11】 2019-05-24
 #### 1.修复了双进程守护可能诱发的“android.os.DeadSystemException”异常；
 #### 2.新增KeepLive.useSilenceMusice(boolean) API，可设置是否启用无声音乐（默认开启）；
@@ -85,13 +87,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.11</version>
+  <version>1.1.12</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.11'
+implementation 'com.fanjun:keeplive:1.1.12'
 ```
 
 #### 联系我
