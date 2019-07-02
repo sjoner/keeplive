@@ -57,7 +57,6 @@ public class NotificationUtils extends ContextWrapper {
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
     }
-
     public NotificationCompat.Builder getNotification_25(String title, String content, int icon, Intent intent) {
         //PendingIntent.FLAG_UPDATE_CURRENT 这个类型才能传值
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

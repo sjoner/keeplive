@@ -20,6 +20,7 @@ import com.fanjun.keeplive.R;
 import com.fanjun.keeplive.config.NotificationUtils;
 import com.fanjun.keeplive.receiver.NotificationClickReceiver;
 import com.fanjun.keeplive.receiver.OnepxReceiver;
+import com.fanjun.keeplive.utils.ServiceUtils;
 
 public final class LocalService extends Service {
     private OnepxReceiver mOnepxReceiver;
@@ -28,6 +29,7 @@ public final class LocalService extends Service {
     private MediaPlayer mediaPlayer;
     private MyBilder mBilder;
     private android.os.Handler handler;
+    private boolean mIsBoundRemoteService ;
 
     @Override
     public void onCreate() {
@@ -35,7 +37,7 @@ public final class LocalService extends Service {
         if (mBilder == null) {
             mBilder = new MyBilder();
         }
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         isPause = pm.isScreenOn();
         if (handler == null) {
             handler = new Handler();
@@ -49,30 +51,34 @@ public final class LocalService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //播放无声音乐
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.novioce);
-            mediaPlayer.setVolume(0f, 0f);
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    if (!isPause) {
-                        if (KeepLive.runMode == KeepLive.RunMode.ROGUE) {
-                            play();
-                        } else {
-                            if (handler != null) {
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        play();
+        if (KeepLive.useSilenceMusice){
+            //播放无声音乐
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer.create(this, R.raw.novioce);
+                if (mediaPlayer!= null){
+                    mediaPlayer.setVolume(0f, 0f);
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            if (!isPause) {
+                                if (KeepLive.runMode == KeepLive.RunMode.ROGUE) {
+                                    play();
+                                } else {
+                                    if (handler != null) {
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                play();
+                                            }
+                                        }, 5000);
                                     }
-                                }, 10000);
+                                }
                             }
                         }
-                    }
+                    });
+                    play();
                 }
-            });
-            play();
+            }
         }
         //像素保活
         if (mOnepxReceiver == null) {
@@ -100,7 +106,7 @@ public final class LocalService extends Service {
         //绑定守护进程
         try {
             Intent intent3 = new Intent(this, RemoteService.class);
-            this.bindService(intent3, connection, Context.BIND_ABOVE_CLIENT);
+            mIsBoundRemoteService = this.bindService(intent3, connection, Context.BIND_ABOVE_CLIENT);
         } catch (Exception e) {
         }
         //隐藏服务通知
@@ -117,14 +123,18 @@ public final class LocalService extends Service {
     }
 
     private void play() {
-        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
+        if (KeepLive.useSilenceMusice){
+            if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+            }
         }
     }
 
     private void pause() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
+        if (KeepLive.useSilenceMusice){
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+            }
         }
     }
 
@@ -153,13 +163,15 @@ public final class LocalService extends Service {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Intent remoteService = new Intent(LocalService.this,
-                    RemoteService.class);
-            LocalService.this.startService(remoteService);
-            Intent intent = new Intent(LocalService.this, RemoteService.class);
-            LocalService.this.bindService(intent, connection,
-                    Context.BIND_ABOVE_CLIENT);
-            PowerManager pm = (PowerManager) LocalService.this.getSystemService(Context.POWER_SERVICE);
+            if (ServiceUtils.isServiceRunning(getApplicationContext(), "com.fanjun.keeplive.service.LocalService")){
+                Intent remoteService = new Intent(LocalService.this,
+                        RemoteService.class);
+                LocalService.this.startService(remoteService);
+                Intent intent = new Intent(LocalService.this, RemoteService.class);
+                mIsBoundRemoteService = LocalService.this.bindService(intent, connection,
+                        Context.BIND_ABOVE_CLIENT);
+            }
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             boolean isScreenOn = pm.isScreenOn();
             if (isScreenOn) {
                 sendBroadcast(new Intent("_ACTION_SCREEN_ON"));
@@ -184,9 +196,17 @@ public final class LocalService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
-        unregisterReceiver(mOnepxReceiver);
-        unregisterReceiver(screenStateReceiver);
+        if (connection != null){
+            try {
+                if (mIsBoundRemoteService){
+                    unbindService(connection);
+                }
+            }catch (Exception e){}
+        }
+        try {
+            unregisterReceiver(mOnepxReceiver);
+            unregisterReceiver(screenStateReceiver);
+        }catch (Exception e){}
         if (KeepLive.keepLiveService != null) {
             KeepLive.keepLiveService.onStop();
         }

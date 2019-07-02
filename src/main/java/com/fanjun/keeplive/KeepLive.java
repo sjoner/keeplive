@@ -13,6 +13,8 @@ import com.fanjun.keeplive.service.JobHandlerService;
 import com.fanjun.keeplive.service.LocalService;
 import com.fanjun.keeplive.service.RemoteService;
 
+import java.util.List;
+
 /**
  * 保活工具
  */
@@ -32,18 +34,20 @@ public final class KeepLive {
          */
         ROGUE
     }
+
     public static ForegroundNotification foregroundNotification = null;
     public static KeepLiveService keepLiveService = null;
     public static RunMode runMode = null;
+    public static boolean useSilenceMusice = true;
 
     /**
      * 启动保活
      *
      * @param application            your application
-     * @param foregroundNotification 前台服务
+     * @param foregroundNotification 前台服务 必须要，安卓8.0后必须有前台通知才能正常启动Service
      * @param keepLiveService        保活业务
      */
-    public static void startWork(@NonNull Application application, @NonNull RunMode runMode, ForegroundNotification foregroundNotification, @NonNull KeepLiveService keepLiveService) {
+    public static void startWork(@NonNull Application application, @NonNull RunMode runMode, @NonNull ForegroundNotification foregroundNotification, @NonNull KeepLiveService keepLiveService) {
         if (isMain(application)) {
             KeepLive.foregroundNotification = foregroundNotification;
             KeepLive.keepLiveService = keepLiveService;
@@ -67,19 +71,31 @@ public final class KeepLive {
         }
     }
 
+    /**
+     * 是否启用无声音乐
+     * 如不设置，则默认启用
+     * @param enable
+     */
+    public static void useSilenceMusice(boolean enable){
+        KeepLive.useSilenceMusice = enable;
+    }
+
     private static boolean isMain(Application application) {
         int pid = android.os.Process.myPid();
         String processName = "";
         ActivityManager mActivityManager = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager.getRunningAppProcesses()) {
-            if (appProcess.pid == pid) {
-                processName = appProcess.processName;
-                break;
+        List<ActivityManager.RunningAppProcessInfo> runningAppProcessInfos = mActivityManager.getRunningAppProcesses();
+        if (runningAppProcessInfos != null) {
+            for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager.getRunningAppProcesses()) {
+                if (appProcess.pid == pid) {
+                    processName = appProcess.processName;
+                    break;
+                }
             }
-        }
-        String packageName = application.getPackageName();
-        if (processName.equals(packageName)) {
-            return true;
+            String packageName = application.getPackageName();
+            if (processName.equals(packageName)) {
+                return true;
+            }
         }
         return false;
     }

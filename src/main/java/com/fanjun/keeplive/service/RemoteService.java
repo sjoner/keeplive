@@ -10,12 +10,10 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.fanjun.keeplive.config.ForegroundNotification;
 import com.fanjun.keeplive.config.NotificationUtils;
 import com.fanjun.keeplive.receiver.NotificationClickReceiver;
+import com.fanjun.keeplive.utils.ServiceUtils;
 
 /**
  * 守护进程
@@ -23,6 +21,7 @@ import com.fanjun.keeplive.receiver.NotificationClickReceiver;
 @SuppressWarnings(value={"unchecked", "deprecation"})
 public final class RemoteService extends Service {
     private MyBilder mBilder;
+    private boolean mIsBoundLocalService ;
 
 
     @Override
@@ -41,7 +40,7 @@ public final class RemoteService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            this.bindService(new Intent(RemoteService.this, LocalService.class),
+            mIsBoundLocalService = this.bindService(new Intent(RemoteService.this, LocalService.class),
                     connection, Context.BIND_ABOVE_CLIENT);
         }catch (Exception e){
         }
@@ -51,7 +50,13 @@ public final class RemoteService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
+        if (connection != null){
+            try {
+                if (mIsBoundLocalService){
+                    unbindService(connection);
+                }
+            }catch (Exception e){}
+        }
     }
     private final class MyBilder extends GuardAidl.Stub {
 
@@ -70,11 +75,13 @@ public final class RemoteService extends Service {
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Intent remoteService = new Intent(RemoteService.this,
-                    LocalService.class);
-            RemoteService.this.startService(remoteService);
-            RemoteService.this.bindService(new Intent(RemoteService.this,
-                    LocalService.class), connection, Context.BIND_ABOVE_CLIENT);
+            if (ServiceUtils.isRunningTaskExist(getApplicationContext(), getPackageName() + ":remote")){
+                Intent localService = new Intent(RemoteService.this,
+                        LocalService.class);
+                RemoteService.this.startService(localService);
+                mIsBoundLocalService = RemoteService.this.bindService(new Intent(RemoteService.this,
+                        LocalService.class), connection, Context.BIND_ABOVE_CLIENT);
+            }
             PowerManager pm = (PowerManager) RemoteService.this.getSystemService(Context.POWER_SERVICE);
             boolean isScreenOn = pm.isScreenOn();
             if (isScreenOn){
