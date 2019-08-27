@@ -7,8 +7,9 @@
 ### 基于AIDL的组件化框架，具有轻量化，倾入性极低的优点，欢迎踊跃提出改良建议！
 ## 更新日志
 
-### 【1.1.17】 2019-08-27
+### 【1.1.18】 2019-08-27
 #### 1.优化了JobHandlerService的保活策略（8.0以下有效）；
+#### 2.绕过高版本不允许后台打开Activity的限制，像素保活高版本可用。
 ### 【1.1.14】 2019-08-07
 #### 1.修复了可能发生的“ Apps may not schedule more than 100 distinct jobs”异常；
 ### 【1.1.12】 2019-06-21
@@ -90,13 +91,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.17</version>
+  <version>1.1.18</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.17'
+implementation 'com.fanjun:keeplive:1.1.18'
 ```
 
 #### 联系我
