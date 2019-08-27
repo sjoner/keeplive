@@ -6,6 +6,8 @@
 ## 新框架发布 https://github.com/fanqieVip/processroute
 ### 基于AIDL的组件化框架，具有轻量化，倾入性极低的优点，欢迎踊跃提出改良建议！
 ## 更新日志
+### 【1.1.16】 2019-08-27
+#### 1.优化了JobHandlerService启动策略；
 ### 【1.1.14】 2019-08-07
 #### 1.修复了可能发生的“ Apps may not schedule more than 100 distinct jobs”异常；
 ### 【1.1.12】 2019-06-21
@@ -87,13 +89,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.14</version>
+  <version>1.1.16</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.14'
+implementation 'com.fanjun:keeplive:1.1.16'
 ```
 
 #### 联系我
