@@ -12,9 +12,9 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import com.fanjun.keeplive.KeepLive;
-import com.fanjun.keeplive.utils.ServiceUtils;
 import com.fanjun.keeplive.config.NotificationUtils;
 import com.fanjun.keeplive.receiver.NotificationClickReceiver;
+import com.fanjun.keeplive.utils.ServiceUtils;
 
 /**
  * 定时器
@@ -24,13 +24,15 @@ import com.fanjun.keeplive.receiver.NotificationClickReceiver;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public final class JobHandlerService extends JobService {
     private JobScheduler mJobScheduler;
+    private int jobId = 100;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startService(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobInfo.Builder builder = new JobInfo.Builder(startId++,
+            mJobScheduler.cancel(jobId);
+            JobInfo.Builder builder = new JobInfo.Builder(jobId,
                     new ComponentName(getPackageName(), JobHandlerService.class.getName()));
             if (Build.VERSION.SDK_INT >= 24) {
                 builder.setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS); //执行的最小延迟时间
@@ -39,9 +41,11 @@ public final class JobHandlerService extends JobService {
                 builder.setBackoffCriteria(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS, JobInfo.BACKOFF_POLICY_LINEAR);//线性重试方案
             } else {
                 builder.setPeriodic(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);
+                builder.setRequiresDeviceIdle(true);
             }
             builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
             builder.setRequiresCharging(true); // 当插入充电器，执行该任务
+            builder.setPersisted(true);
             mJobScheduler.schedule(builder.build());
         }
         return START_STICKY;

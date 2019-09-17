@@ -29,10 +29,12 @@ public final class OnePixelActivity extends Activity {
         checkScreenOn("onResume");
     }
     private void checkScreenOn(String methodName) {
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        boolean isScreenOn = pm.isScreenOn();
-        if (isScreenOn) {
-            finish();
-        }
+        try{
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            boolean isScreenOn = pm.isScreenOn();
+            if (isScreenOn) {
+                finish();
+            }
+        }catch (Exception e){}
     }
 }
