@@ -8,7 +8,7 @@
 
 ## 更新日志
 
-### 【1.1.19】 2019-09-23
+### 【1.1.20】 2019-09-23
 #### 1.更正了JobHandlerService的一些设置（之前我理解API有误，感谢 @海洋と心 指出错误）；
 ### 【1.1.18】 2019-08-27
 #### 1.优化了JobHandlerService的保活策略（8.0以下有效）；
@@ -94,13 +94,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.19</version>
+  <version>1.1.20</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.19'
+implementation 'com.fanjun:keeplive:1.1.20'
 ```
 ### 注意事项
 
