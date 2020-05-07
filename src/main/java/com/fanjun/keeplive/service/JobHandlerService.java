@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.NotificationUtils;
 import com.fanjun.keeplive.receiver.NotificationClickReceiver;
@@ -20,8 +21,8 @@ import com.fanjun.keeplive.utils.ServiceUtils;
  * 定时器
  * 安卓5.0及以上
  */
-@SuppressWarnings(value = {"unchecked", "deprecation"})
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+@SuppressWarnings(value = {"unchecked", "deprecation"})
 public final class JobHandlerService extends JobService {
     private JobScheduler mJobScheduler;
     private int jobId = 100;
@@ -52,20 +53,29 @@ public final class JobHandlerService extends JobService {
     }
 
     private void startService(Context context) {
+        //启动本地服务
+        Intent localIntent = new Intent(context, LocalService.class);
+        //启动守护进程
+        Intent guardIntent = new Intent(context, RemoteService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(localIntent);
+            context.startForegroundService(guardIntent);
+        } else {
+            context.startService(localIntent);
+            context.startService(guardIntent);
+        }
+
+        //使用 startForegroundService 启动service 后需要在5秒内 调用startoreground 否则会抛出ANR 异常
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (KeepLive.foregroundNotification != null) {
                 Intent intent2 = new Intent(getApplicationContext(), NotificationClickReceiver.class);
                 intent2.setAction(NotificationClickReceiver.CLICK_NOTIFICATION);
                 Notification notification = NotificationUtils.createNotification(this, KeepLive.foregroundNotification.getTitle(), KeepLive.foregroundNotification.getDescription(), KeepLive.foregroundNotification.getIconRes(), intent2);
                 startForeground(13691, notification);
+            }else {
+                startForeground(1, new Notification());
             }
         }
-        //启动本地服务
-        Intent localIntent = new Intent(context, LocalService.class);
-        //启动守护进程
-        Intent guardIntent = new Intent(context, RemoteService.class);
-        startService(localIntent);
-        startService(guardIntent);
     }
 
     @Override
