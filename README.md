@@ -6,6 +6,8 @@
 
 ## 更新日志
 
+### 【1.1.22】 2020-06-19
+#### 1.回滚了上一版本的部分代码，21版本存在一些故障，请尽快更新；
 ### 【1.1.21】 2020-05-07
 #### 1.修复了安卓8.0后启动service可能失败的bug；
 ### 【1.1.20】 2019-09-23
@@ -94,13 +96,13 @@
 <dependency>
   <groupId>com.fanjun</groupId>
   <artifactId>keeplive</artifactId>
-  <version>1.1.21</version>
+  <version>1.1.22</version>
   <type>pom</type>
 </dependency>
 ```
 #### Gradle
 ```Xml
-implementation 'com.fanjun:keeplive:1.1.21'
+implementation 'com.fanjun:keeplive:1.1.22'
 ```
 ### 注意事项
 
