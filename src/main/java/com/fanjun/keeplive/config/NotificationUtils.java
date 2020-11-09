@@ -22,8 +22,8 @@ public class NotificationUtils extends ContextWrapper {
     private NotificationUtils(Context context) {
         super(context);
         this.context = context;
-        id = context.getPackageName();
-        name = context.getPackageName();
+        id = "Huilaidian_Sound";
+        name = "语音提醒";
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -35,6 +35,7 @@ public class NotificationUtils extends ContextWrapper {
             channel.enableVibration(false);
             channel.setVibrationPattern(new long[]{0});
             channel.setSound(null, null);
+            channel.setShowBadge(false);
             getManager().createNotificationChannel(channel);
         }
     }
